@@ -1,0 +1,18 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      # inclui a integração com pgvector (Testcontainers — Docker disponível no runner)
+      # e a regressão de qualidade (NDCG@10 da híbrida ≥ 0,70 e > baseline)
+      - run: pnpm test:cov
+      - run: pnpm build
